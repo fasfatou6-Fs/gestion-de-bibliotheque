@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LivresController; // Étape 1 : On importe ton contrôleur de livres
+use App\Http\Controllers\EmpruntController; // Étape 1 : On importe ton contrôleur d'emprunts
+
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil
@@ -9,7 +11,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Ton Dashboard existant (protégé par auth et verified)
+//  Dashboard existant (protégé par auth et verified)
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -24,6 +26,15 @@ Route::middleware('auth')->group(function () {
     // Les routes pour la gestion des livres
     // Cette seule ligne génère automatiquement les routes pour index, create, store, edit, update, destroy
     Route::resource('livres', LivresController::class);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/emprunts', [EmpruntController::class, 'index'])->name('emprunts.index');
+    Route::get('/emprunts/creer', [EmpruntController::class, 'create'])->name('emprunts.create');
+    Route::post('/emprunts', [EmpruntController::class, 'store'])->name('emprunts.store');
+
+    // marquer un livre comme rendu
+    Route::patch('/emprunts/{emprunt}/rendre', [EmpruntController::class, 'marquerCommeRendu'])->name('emprunts.rendre');
 });
 
 // L'authentification par défaut de Laravel (Laravel Breeze, Jetstream, etc.)
